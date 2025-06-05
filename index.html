@@ -181,11 +181,13 @@
     }
 
     /**
-     * Fetches “transfer” news from GNews.io by adding “transfer” to the query.
+     * Fetches “transfer” news from GNews.io by using the broader “football transfer” query.
+     * Returns a Promise resolving to an array of article objects.
      */
     function fetchTransferNews() {
       const url = new URL('https://gnews.io/api/v4/search');
-      url.searchParams.set('q', 'football transfer OR transfer rumor');
+      // BROADENED QUERY: “football transfer”
+      url.searchParams.set('q', 'football transfer');
       url.searchParams.set('lang', 'en');
       url.searchParams.set('max', '10');
       url.searchParams.set('sortby', 'publishedAt');
@@ -227,4 +229,3 @@
   <!-- ─── End of GNews script ─── -->
 </body>
 </html>
-
