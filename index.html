@@ -3,10 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <title>Football News & Transfer Updates</title>
-  <!-- You can remove this <link> if you don’t have an external styles.css,
-       since we include all the CSS below inline. -->
-  <!-- <link rel="stylesheet" href="styles.css" /> -->
-
   <style>
     /* ─── Basic page layout ─── */
     body {
@@ -97,31 +93,28 @@
     </section>
   </main>
 
-  <!-- ─── Live‐News Fetch Script ─── -->
+  <!-- ─── Live‐News Fetch Script (using GNews.io) ─── -->
   <script>
-    // ─── Your NewsAPI.org API key (already inserted) ───
-    const API_KEY = 'a6220284e3c94b838f44314febdecfd2';
+    // ─── Your GNews.io API key ───
+    const GNEWS_TOKEN = 'e3a7b27822593cbc6323fef408a74f13';
 
     /**
-     * Renders an array of NewsAPI articles into the given container.
-     * @param {Array} articles – array of { title, url, description, source: { name }, publishedAt, ... }
+     * Renders an array of GNews articles into the given container.
+     * @param {Array} articles – each item: { title, description, url, image, publishedAt, source: { name, url } }
      * @param {string} containerId – ID of the <div> where we’ll insert the <ul> list
      */
     function renderArticles(articles, containerId) {
       const container = document.getElementById(containerId);
       container.innerHTML = ''; // Clear “Loading…” or previous content
 
-      // If no articles were returned, show fallback text
       if (!articles || articles.length === 0) {
         container.innerHTML = '<p class="placeholder">No articles found.</p>';
         return;
       }
 
-      // Create a <ul> with class "article-list"
       const list = document.createElement('ul');
       list.className = 'article-list';
 
-      // Loop over each article and build an <li>
       articles.forEach((article) => {
         const li = document.createElement('li');
 
@@ -155,30 +148,31 @@
     }
 
     /**
-     * Fetches “general football news” from NewsAPI.org.
+     * Fetches “general football news” from GNews.io.
      * Returns a Promise that resolves to an array of article objects.
      */
     function fetchGeneralNews() {
-      const url = new URL('https://newsapi.org/v2/everything');
-      url.searchParams.set('q', 'football');
-      url.searchParams.set('language', 'en');
-      url.searchParams.set('pageSize', '10');         // Up to 10 articles
-      url.searchParams.set('sortBy', 'publishedAt');  // Sort by newest
-      url.searchParams.set('apiKey', API_KEY);
+      const url = new URL('https://gnews.io/api/v4/search');
+      url.searchParams.set('q', 'football');             // Search term = “football”
+      url.searchParams.set('lang', 'en');                // Only English-language
+      url.searchParams.set('max', '10');                 // Up to 10 articles
+      url.searchParams.set('sortby', 'publishedAt');      // Newest first
+      url.searchParams.set('token', GNEWS_TOKEN);        // Your GNews API key
 
       return fetch(url.toString())
         .then((res) => {
           if (!res.ok) {
-            throw new Error(`NewsAPI returned status ${res.status}`);
+            throw new Error(`GNews returned status ${res.status}`);
           }
           return res.json();
         })
         .then((json) => {
-          if (json.status !== 'ok') {
-            console.error('NewsAPI error payload:', json);
+          // GNews returns { totalArticles: N, articles: [ … ] }
+          if (!json.articles) {
+            console.error('GNews error payload:', json);
             return [];
           }
-          return json.articles || [];
+          return json.articles;
         })
         .catch((err) => {
           console.error('Error fetching general news:', err);
@@ -187,30 +181,29 @@
     }
 
     /**
-     * Fetches “transfer” news by searching for "football transfer" or "transfer rumor".
-     * Returns a Promise resolving to an array of article objects.
+     * Fetches “transfer” news from GNews.io by adding “transfer” to the query.
      */
     function fetchTransferNews() {
-      const url = new URL('https://newsapi.org/v2/everything');
+      const url = new URL('https://gnews.io/api/v4/search');
       url.searchParams.set('q', 'football transfer OR transfer rumor');
-      url.searchParams.set('language', 'en');
-      url.searchParams.set('pageSize', '10');
-      url.searchParams.set('sortBy', 'publishedAt');
-      url.searchParams.set('apiKey', API_KEY);
+      url.searchParams.set('lang', 'en');
+      url.searchParams.set('max', '10');
+      url.searchParams.set('sortby', 'publishedAt');
+      url.searchParams.set('token', GNEWS_TOKEN);
 
       return fetch(url.toString())
         .then((res) => {
           if (!res.ok) {
-            throw new Error(`NewsAPI returned status ${res.status}`);
+            throw new Error(`GNews returned status ${res.status}`);
           }
           return res.json();
         })
         .then((json) => {
-          if (json.status !== 'ok') {
-            console.error('NewsAPI error payload:', json);
+          if (!json.articles) {
+            console.error('GNews error payload:', json);
             return [];
           }
-          return json.articles || [];
+          return json.articles;
         })
         .catch((err) => {
           console.error('Error fetching transfer news:', err);
@@ -218,21 +211,20 @@
         });
     }
 
-    // Once the DOM is fully loaded, fetch & render both sets of news
+    // When the DOM is fully loaded, fetch & render both sets of news
     document.addEventListener('DOMContentLoaded', () => {
-      // 1) General football news:
+      // 1) General football news
       fetchGeneralNews().then((articles) => {
         renderArticles(articles, 'latest-news-container');
       });
 
-      // 2) Transfer-specific news:
+      // 2) Transfer-specific news
       fetchTransferNews().then((articles) => {
         renderArticles(articles, 'transfer-news-container');
       });
     });
   </script>
-  <!-- ─── End of script ─── -->
-
+  <!-- ─── End of GNews script ─── -->
 </body>
 </html>
 
