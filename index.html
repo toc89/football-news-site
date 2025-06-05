@@ -1,164 +1,238 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Football News & Transfers</title>
-    <style>
-        /* ====== Overall Page Styles ====== */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-        header {
-            background-color: #1e3a8a;    /* Dark blue background */
-            color: #fff;                   /* White text */
-            padding: 1rem 0;
-            text-align: center;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-        h2 {
-            color: #1e3a8a; /* Dark blue headings */
-            margin-bottom: 1rem;
-        }
-        .news-section {
-            margin-bottom: 3rem;
-        }
-        /* ====== Individual Article Styles ====== */
-        .news-item {
-            background-color: #fff;
-            margin-bottom: 1rem;
-            padding: 1rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .news-item h3 {
-            margin: 0 0 0.5rem;
-        }
-        .news-item p {
-            margin: 0.5rem 0;
-            line-height: 1.4;
-        }
-        .news-item a {
-            color: #1e3a8a;    /* Dark blue link */
-            text-decoration: none;
-        }
-        .news-item a:hover {
-            text-decoration: underline;
-        }
-        .loading {
-            font-style: italic;
-            color: #555;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Football News & Transfer Updates</title>
+  <!-- You can remove this <link> if you don’t have an external styles.css,
+       since we include all the CSS below inline. -->
+  <!-- <link rel="stylesheet" href="styles.css" /> -->
+
+  <style>
+    /* ─── Basic page layout ─── */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f9fa;
+    }
+    header {
+      background-color: #003366;
+      color: #ffffff;
+      padding: 1rem;
+      text-align: center;
+    }
+    main {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    section {
+      margin-bottom: 2rem;
+    }
+    section h2 {
+      color: #003366;
+      border-bottom: 2px solid #003366;
+      padding-bottom: 0.25rem;
+      margin-bottom: 1rem;
+    }
+
+    /* ─── Article list styling ─── */
+    ul.article-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    ul.article-list li {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #ddd;
+    }
+    ul.article-list li a {
+      text-decoration: none;
+      color: #003366;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+    ul.article-list li a:hover {
+      text-decoration: underline;
+    }
+    ul.article-list li .meta {
+      font-size: 0.9rem;
+      color: #555;
+      margin-top: 0.25rem;
+    }
+    ul.article-list li p.description {
+      margin-top: 0.5rem;
+      color: #333;
+    }
+
+    /* ─── “Loading…” or “No articles found” text styling ─── */
+    .placeholder {
+      font-size: 1rem;
+      color: #666;
+    }
+  </style>
 </head>
+
 <body>
-    <header>
-        <h1>Football News & Transfer Updates</h1>
-    </header>
+  <header>
+    <h1>Football News &amp; Transfer Updates</h1>
+  </header>
 
-    <div class="container">
-        <!-- Latest Football News Section -->
-        <section id="latest-news" class="news-section">
-            <h2>Latest Football News</h2>
-            <div id="latest-news-container">
-                <p class="loading">Loading latest football news...</p>
-            </div>
-        </section>
+  <main>
+    <!-- ─── Latest General Football News Section ─── -->
+    <section id="latest-news">
+      <h2>Latest Football News</h2>
+      <div id="latest-news-container">
+        <p class="placeholder">Loading latest news…</p>
+      </div>
+    </section>
 
-        <!-- Football Transfer News Section -->
-        <section id="transfer-news" class="news-section">
-            <h2>Football Transfer News</h2>
-            <div id="transfer-news-container">
-                <p class="loading">Loading transfer news...</p>
-            </div>
-        </section>
-    </div>
+    <!-- ─── Football Transfer News Section ─── -->
+    <section id="transfer-news">
+      <h2>Football Transfer News</h2>
+      <div id="transfer-news-container">
+        <p class="placeholder">Loading transfer news…</p>
+      </div>
+    </section>
+  </main>
 
-    <script>
-        // ─── YOUR NewsAPI.org KEY HERE ───
-        const API_KEY = 'a6220284e3c94b838f44314febdecfd2';
+  <!-- ─── Live‐News Fetch Script ─── -->
+  <script>
+    // ─── Your NewsAPI.org API key (already inserted) ───
+    const API_KEY = 'a6220284e3c94b838f44314febdecfd2';
 
-        /**
-         * Helper function that fetches news from NewsAPI.org
-         *  - query: the search keywords (e.g. "football", "football transfer").
-         *  - containerId: the ID of the <div> where articles will be inserted.
-         */
-        async function fetchNews(query, containerId) {
-            // Encode query and limit to 10 results, sort by most recent
-            const url =
-              `https://newsapi.org/v2/everything?` +
-              `q=${encodeURIComponent(query)}` +
-              `&language=en` +           // English‐language articles
-              `&sortBy=publishedAt` +    // Sort by newest first
-              `&pageSize=10` +           // Max 10 articles
-              `&apiKey=${API_KEY}`;
+    /**
+     * Renders an array of NewsAPI articles into the given container.
+     * @param {Array} articles – array of { title, url, description, source: { name }, publishedAt, ... }
+     * @param {string} containerId – ID of the <div> where we’ll insert the <ul> list
+     */
+    function renderArticles(articles, containerId) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = ''; // Clear “Loading…” or previous content
 
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
+      // If no articles were returned, show fallback text
+      if (!articles || articles.length === 0) {
+        container.innerHTML = '<p class="placeholder">No articles found.</p>';
+        return;
+      }
 
-                const container = document.getElementById(containerId);
-                container.innerHTML = '';  // Clear the “Loading…” text
+      // Create a <ul> with class "article-list"
+      const list = document.createElement('ul');
+      list.className = 'article-list';
 
-                // If the API returns an error or no articles, show a message
-                if (data.status !== 'ok' || data.articles.length === 0) {
-                    container.innerHTML = '<p>No articles found.</p>';
-                    return;
-                }
+      // Loop over each article and build an <li>
+      articles.forEach((article) => {
+        const li = document.createElement('li');
 
-                // Otherwise, create a .news-item for each article
-                data.articles.forEach(article => {
-                    const item = document.createElement('div');
-                    item.className = 'news-item';
+        // 1) Title as clickable link
+        const a = document.createElement('a');
+        a.href = article.url;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = article.title;
+        li.appendChild(a);
 
-                    // Article Title as a clickable link
-                    const title = document.createElement('h3');
-                    const link = document.createElement('a');
-                    link.href = article.url;
-                    link.target = '_blank';  // Opens in new tab
-                    link.textContent = article.title;
-                    title.appendChild(link);
+        // 2) Meta info: source name + published date
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        const publishedDate = new Date(article.publishedAt).toLocaleString();
+        meta.textContent = `${article.source.name} • ${publishedDate}`;
+        li.appendChild(meta);
 
-                    // Article Description (if available)
-                    const description = document.createElement('p');
-                    description.textContent = article.description || '';
-
-                    // Published Date/Time
-                    const publishedAt = document.createElement('p');
-                    publishedAt.style.fontSize = '0.85rem';
-                    publishedAt.style.color = '#666';
-                    publishedAt.textContent = new Date(article.publishedAt).toLocaleString();
-
-                    // Append title, description, and timestamp into the news‐item
-                    item.appendChild(title);
-                    item.appendChild(description);
-                    item.appendChild(publishedAt);
-
-                    // Finally, append this item into the container
-                    container.appendChild(item);
-                });
-            } catch (error) {
-                console.error('Error fetching news:', error);
-                const container = document.getElementById(containerId);
-                container.innerHTML = '<p>Error loading news. Please try again later.</p>';
-            }
+        // 3) Short description (if available)
+        if (article.description) {
+          const desc = document.createElement('p');
+          desc.className = 'description';
+          desc.textContent = article.description;
+          li.appendChild(desc);
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            // 1) Fetch the most recent football headlines (e.g. "football OR soccer")
-            fetchNews('football OR soccer', 'latest-news-container');
+        list.appendChild(li);
+      });
 
-            // 2) Fetch the latest transfer stories (e.g. "football transfer OR soccer transfer")
-            fetchNews('football transfer OR soccer transfer', 'transfer-news-container');
+      container.appendChild(list);
+    }
+
+    /**
+     * Fetches “general football news” from NewsAPI.org.
+     * Returns a Promise that resolves to an array of article objects.
+     */
+    function fetchGeneralNews() {
+      const url = new URL('https://newsapi.org/v2/everything');
+      url.searchParams.set('q', 'football');
+      url.searchParams.set('language', 'en');
+      url.searchParams.set('pageSize', '10');         // Up to 10 articles
+      url.searchParams.set('sortBy', 'publishedAt');  // Sort by newest
+      url.searchParams.set('apiKey', API_KEY);
+
+      return fetch(url.toString())
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error(`NewsAPI returned status ${res.status}`);
+          }
+          return res.json();
+        })
+        .then((json) => {
+          if (json.status !== 'ok') {
+            console.error('NewsAPI error payload:', json);
+            return [];
+          }
+          return json.articles || [];
+        })
+        .catch((err) => {
+          console.error('Error fetching general news:', err);
+          return [];
         });
-    </script>
+    }
+
+    /**
+     * Fetches “transfer” news by searching for "football transfer" or "transfer rumor".
+     * Returns a Promise resolving to an array of article objects.
+     */
+    function fetchTransferNews() {
+      const url = new URL('https://newsapi.org/v2/everything');
+      url.searchParams.set('q', 'football transfer OR transfer rumor');
+      url.searchParams.set('language', 'en');
+      url.searchParams.set('pageSize', '10');
+      url.searchParams.set('sortBy', 'publishedAt');
+      url.searchParams.set('apiKey', API_KEY);
+
+      return fetch(url.toString())
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error(`NewsAPI returned status ${res.status}`);
+          }
+          return res.json();
+        })
+        .then((json) => {
+          if (json.status !== 'ok') {
+            console.error('NewsAPI error payload:', json);
+            return [];
+          }
+          return json.articles || [];
+        })
+        .catch((err) => {
+          console.error('Error fetching transfer news:', err);
+          return [];
+        });
+    }
+
+    // Once the DOM is fully loaded, fetch & render both sets of news
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1) General football news:
+      fetchGeneralNews().then((articles) => {
+        renderArticles(articles, 'latest-news-container');
+      });
+
+      // 2) Transfer-specific news:
+      fetchTransferNews().then((articles) => {
+        renderArticles(articles, 'transfer-news-container');
+      });
+    });
+  </script>
+  <!-- ─── End of script ─── -->
+
 </body>
 </html>
 
