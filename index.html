@@ -5,8 +5,8 @@
   <title>Football News & Transfer Updates</title>
 
   <!-- ─── Google site verification tag ─── -->
-  <meta name="google-site-verification" content="RrZblqsc9xcSnYhE0egWJdaRCPV0Lchbfsmc1mMUcH8" />
-
+  
+<meta name="google-site-verification" content="RrZblqsc9xcSnYhEOegWVdaRCPV0LcHbfsmc1mMUcH8" />
   <!-- ─── Your existing SEO meta tags ─── -->
   <meta name="description" content="Get the latest football news and transfer updates, refreshed live via GNews.io." />
   <meta name="keywords" content="football news, transfer news, soccer transfers, live football headlines" />
@@ -23,6 +23,7 @@
     /* ─── Basic page layout ─── */
     body {
       font-family: Arial, sans-serif;
+
       margin: 0;
       padding: 0;
       background-color: #f8f9fa;
@@ -169,11 +170,11 @@
      */
     function fetchGeneralNews() {
       const url = new URL('https://gnews.io/api/v4/search');
-      url.searchParams.set('q', 'football');             // Search term = “football”
-      url.searchParams.set('lang', 'en');                // Only English-language
-      url.searchParams.set('max', '10');                 // Up to 10 articles
-      url.searchParams.set('sortby', 'publishedAt');      // Newest first
-      url.searchParams.set('token', GNEWS_TOKEN);        // Your GNews API key
+      url.searchParams.set('q', 'football');        // Search term = “football”
+      url.searchParams.set('lang', 'en');           // Only English-language
+      url.searchParams.set('max', '10');            // Up to 10 articles
+      url.searchParams.set('sortby', 'publishedAt'); // Newest first
+      url.searchParams.set('token', GNEWS_TOKEN);   // Your GNews API key
 
       return fetch(url.toString())
         .then((res) => {
