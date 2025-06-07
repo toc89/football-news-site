@@ -1,26 +1,49 @@
-# .github/workflows/post-to-x.yml
-
 name: Post Latest News to X
 
-# Run every hour, on the hour (UTC)
 on:
   schedule:
     - cron: '0 * * * *'
+  workflow_dispatch:
 
 jobs:
   post_to_x:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Post a tweet linking to your site
-        env:
-          BEARER_TOKEN: ${{ secrets.TWITTER_BEARER_TOKEN }}
-        run: |
-          # Customize this however you want (emoji, wording, etc.)
-          MESSAGE="⚽ Stay up-to-date: https://toc89.github.io/football-news-site/"
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-          # Send the post via the X (Twitter) API v2
-          curl -X POST "https://api.twitter.com/2/tweets" \
-            -H "Authorization: Bearer $BEARER_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d "{\"text\": \"$MESSAGE\"}"
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
+      - name: Install dependencies
+        run: npm install twitter-api-v2
+
+      - name: Post latest headline to X
+        env:
+          TW_CONSUMER_KEY:   ${{ secrets.TW_CONSUMER_KEY }}
+          TW_CONSUMER_SECRET:${{ secrets.TW_CONSUMER_SECRET }}
+          TW_ACCESS_TOKEN:   ${{ secrets.TW_ACCESS_TOKEN }}
+          TW_ACCESS_SECRET:  ${{ secrets.TW_ACCESS_SECRET }}
+        run: |
+          node <<'JS'
+          import { TwitterApi } from 'twitter-api-v2';
+          // load your secrets from env
+          const client = new TwitterApi({
+            appKey: process.env.TW_CONSUMER_KEY,
+            appSecret: process.env.TW_CONSUMER_SECRET,
+            accessToken: process.env.TW_ACCESS_TOKEN,
+            accessSecret: process.env.TW_ACCESS_SECRET,
+          });
+          (async () => {
+            // read your index.html and scrape the first headline
+            const fs = require('fs');
+            const html = fs.readFileSync('index.html', 'utf-8');
+            const match = html.match(/<h2[^>]*>(.+?)<\/h2>/);
+            const headline = match ? match[1] : 'No headline found';
+            const status = `${headline} — read more at https://toc89.github.io/football-news-site/`;
+            const { data } = await client.v2.tweet(status);
+            console.log('Tweet sent, ID:', data.id);
+          })();
+          JS
