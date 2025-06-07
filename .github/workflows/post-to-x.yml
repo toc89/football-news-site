@@ -2,48 +2,46 @@ name: Post Latest News to X
 
 on:
   schedule:
-    - cron: '0 * * * *'
+    - cron: "0 * * * *"
   workflow_dispatch:
 
 jobs:
   post_to_x:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
+          node-version: '16'
 
-      - name: Install dependencies
-        run: npm install twitter-api-v2
-
-      - name: Post latest headline to X
-        env:
-          TW_CONSUMER_KEY:   ${{ secrets.TW_CONSUMER_KEY }}
-          TW_CONSUMER_SECRET:${{ secrets.TW_CONSUMER_SECRET }}
-          TW_ACCESS_TOKEN:   ${{ secrets.TW_ACCESS_TOKEN }}
-          TW_ACCESS_SECRET:  ${{ secrets.TW_ACCESS_SECRET }}
+      - name: Install Twitter library
         run: |
-          node <<'JS'
-          import { TwitterApi } from 'twitter-api-v2';
-          // load your secrets from env
-          const client = new TwitterApi({
-            appKey: process.env.TW_CONSUMER_KEY,
-            appSecret: process.env.TW_CONSUMER_SECRET,
-            accessToken: process.env.TW_ACCESS_TOKEN,
-            accessSecret: process.env.TW_ACCESS_SECRET,
-          });
-          (async () => {
-            // read your index.html and scrape the first headline
-            const fs = require('fs');
-            const html = fs.readFileSync('index.html', 'utf-8');
-            const match = html.match(/<h2[^>]*>(.+?)<\/h2>/);
-            const headline = match ? match[1] : 'No headline found';
-            const status = `${headline} — read more at https://toc89.github.io/football-news-site/`;
-            const { data } = await client.v2.tweet(status);
-            console.log('Tweet sent, ID:', data.id);
-          })();
-          JS
+          npm init -y
+          npm install twitter-api-v2
+
+      - name: Post Latest News to X
+        env:
+          TW_CONSUMER_KEY:    ${{ secrets.TW_CONSUMER_KEY }}
+          TW_CONSUMER_SECRET: ${{ secrets.TW_CONSUMER_SECRET }}
+          TW_ACCESS_TOKEN:    ${{ secrets.TW_ACCESS_TOKEN }}
+          TW_ACCESS_SECRET:   ${{ secrets.TW_ACCESS_SECRET }}
+          NEWS_API_KEY:       ${{ secrets.NEWS_API_KEY }}
+        run: |
+          node -e "
+            const { TwitterApi } = require('twitter-api-v2');
+            const client = new TwitterApi({
+              appKey: process.env.TW_CONSUMER_KEY,
+              appSecret: process.env.TW_CONSUMER_SECRET,
+              accessToken: process.env.TW_ACCESS_TOKEN,
+              accessSecret: process.env.TW_ACCESS_SECRET,
+            });
+            (async () => {
+              const headline = 'Stay up-to-date: https://toc89.github.io/football-news-site/';
+              const { data } = await client.v2.tweet(headline);
+              console.log('✅ Tweet sent, ID:', data.id);
+            })();
+          "
