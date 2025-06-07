@@ -2,103 +2,92 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Football News & Transfer Updates</title>
-  <meta name="description" content="Live football headlines and transfer news." />
+  <title>Football News & Transfers</title>
+  <meta name="description" content="Live football headlines and transfer news refreshed hourly." />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Tailwind CSS via CDN -->
+
+  <!-- Tailwind via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-gray-100 text-gray-800">
 
-  <!-- Hero Banner -->
+  <!-- Hero -->
   <header class="bg-blue-900 text-white py-12 shadow-lg">
-    <div class="max-w-4xl mx-auto px-4 text-center">
+    <div class="max-w-4xl mx-auto text-center px-4">
       <h1 class="text-5xl font-extrabold mb-2">⚽ Football News & Transfers</h1>
       <p class="text-lg">Live headlines refreshed hourly</p>
       <a href="https://buymeacoffee.com/yourname"
-         class="mt-4 inline-block bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold py-2 px-4 rounded">
+         class="mt-6 inline-block bg-yellow-500 hover:bg-yellow-600 text-blue-900 font-semibold py-3 px-6 rounded-lg shadow">
         ☕ Support Me
       </a>
     </div>
   </header>
 
-  <!-- Main content -->
   <main class="max-w-5xl mx-auto py-8 px-4 space-y-16">
 
     <!-- Latest Football News -->
     <section id="latest-news">
-      <h2 class="text-3xl font-semibold text-blue-900 border-b-4 border-blue-900 pb-2 mb-6">
-        📰 Latest Football News
+      <h2 class="text-3xl font-semibold text-blue-900 border-b-4 border-blue-900 pb-2 mb-6 flex items-center">
+        <span class="mr-2">📰</span> Latest Football News
       </h2>
-      <div id="latest-news-container" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <p class="col-span-full text-gray-600">Loading latest news…</p>
-      </div>
+      <div id="latest-news-container"
+           class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"></div>
     </section>
 
     <!-- Football Transfer News -->
     <section id="transfer-news">
-      <h2 class="text-3xl font-semibold text-blue-900 border-b-4 border-blue-900 pb-2 mb-6">
-        🔄 Transfer News
+      <h2 class="text-3xl font-semibold text-blue-900 border-b-4 border-blue-900 pb-2 mb-6 flex items-center">
+        <span class="mr-2">🔄</span> Transfer News
       </h2>
-      <div id="transfer-news-container" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <p class="col-span-full text-gray-600">Loading transfer news…</p>
-      </div>
+      <div id="transfer-news-container"
+           class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"></div>
     </section>
 
   </main>
 
-  <!-- Fetch & render script -->
+  <!-- GNews.io script -->
   <script>
     const GNEWS_TOKEN = 'e3a7b27822593cbc6323fef408a74f13';
-
-    async function fetchNews(query) {
-      const url = new URL('https://gnews.io/api/v4/search');
-      url.searchParams.set('q', query);
-      url.searchParams.set('lang', 'en');
-      url.searchParams.set('max', '9');
-      url.searchParams.set('sortby', 'publishedAt');
-      url.searchParams.set('token', GNEWS_TOKEN);
-
-      try {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`Status ${res.status}`);
-        const json = await res.json();
-        return json.articles || [];
-      } catch (e) {
-        console.error(e);
-        return [];
-      }
-    }
 
     function renderArticles(articles, containerId) {
       const container = document.getElementById(containerId);
       container.innerHTML = '';
-      if (articles.length === 0) {
+      if (!articles || !articles.length) {
         container.innerHTML = '<p class="col-span-full text-gray-600">No articles found.</p>';
         return;
       }
+
       articles.forEach(a => {
-        const card = document.createElement('article');
-        card.className = 'bg-white rounded-lg shadow hover:shadow-xl transition p-4 flex flex-col';
+        const card = document.createElement('div');
+        card.className = 'bg-white p-4 rounded-lg shadow flex flex-col';
 
-        const img = document.createElement('img');
-        img.src = a.image || 'https://via.placeholder.com/400x200?text=No+Image';
-        img.alt = a.title;
-        img.className = 'h-40 w-full object-cover rounded-t-md mb-4';
-        card.appendChild(img);
+        // 0) Thumbnail
+        if (a.image) {
+          const img = document.createElement('img');
+          img.src       = a.image;
+          img.alt       = a.title;
+          img.className = 'w-full h-40 object-cover rounded-t-lg mb-4';
+          card.appendChild(img);
+        }
 
-        const title = document.createElement('h3');
-        title.className = 'text-lg font-bold mb-2';
-        title.innerHTML = `<a href="${a.url}" target="_blank" class="hover:text-blue-600">${a.title}</a>`;
+        // 1) Title
+        const title = document.createElement('a');
+        title.href      = a.url;
+        title.target    = '_blank';
+        title.rel       = 'noopener';
+        title.textContent = a.title;
+        title.className = 'text-lg font-semibold text-blue-900 hover:underline mb-2';
         card.appendChild(title);
 
+        // 2) Meta
         const meta = document.createElement('p');
         meta.className = 'text-sm text-gray-500 mb-2';
         const date = new Date(a.publishedAt).toLocaleString();
         meta.textContent = `${a.source.name} • ${date}`;
         card.appendChild(meta);
 
+        // 3) Description
         if (a.description) {
           const desc = document.createElement('p');
           desc.className = 'text-gray-700 flex-grow';
@@ -106,24 +95,46 @@
           card.appendChild(desc);
         }
 
-        // Affiliate placeholder
+        // 4) Affiliate link
         const aff = document.createElement('a');
-        aff.href = '#'; // replace with your affiliate link
+        aff.href       = 'https://buymeacoffee.com/yourname';
         aff.textContent = 'Shop gear →';
-        aff.className = 'mt-4 text-sm text-blue-600 hover:underline';
+        aff.className  = 'mt-4 text-sm text-blue-600 hover:underline';
         card.appendChild(aff);
 
         container.appendChild(card);
       });
     }
 
-    document.addEventListener('DOMContentLoaded', async () => {
-      const [gen, trans] = await Promise.all([
-        fetchNews('football'),
-        fetchNews('football transfer')
-      ]);
-      renderArticles(gen, 'latest-news-container');
-      renderArticles(trans, 'transfer-news-container');
+    function fetchGeneralNews() {
+      const url = new URL('https://gnews.io/api/v4/search');
+      url.searchParams.set('q', 'football');
+      url.searchParams.set('lang', 'en');
+      url.searchParams.set('max', '9');
+      url.searchParams.set('sortby', 'publishedAt');
+      url.searchParams.set('token', GNEWS_TOKEN);
+
+      return fetch(url)
+        .then(r => r.ok ? r.json() : Promise.reject(r.status))
+        .then(json => json.articles || []);
+    }
+
+    function fetchTransferNews() {
+      const url = new URL('https://gnews.io/api/v4/search');
+      url.searchParams.set('q', 'football transfer');
+      url.searchParams.set('lang', 'en');
+      url.searchParams.set('max', '9');
+      url.searchParams.set('sortby', 'publishedAt');
+      url.searchParams.set('token', GNEWS_TOKEN);
+
+      return fetch(url)
+        .then(r => r.ok ? r.json() : Promise.reject(r.status))
+        .then(json => json.articles || []);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchGeneralNews().then(arts => renderArticles(arts, 'latest-news-container'));
+      fetchTransferNews().then(arts => renderArticles(arts, 'transfer-news-container'));
     });
   </script>
 
