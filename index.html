@@ -3,247 +3,130 @@
 <head>
   <meta charset="UTF-8" />
   <title>Football News & Transfer Updates</title>
-
-  <!-- ─── Google site verification tag ─── -->
-  
-<meta name="google-site-verification" content="RrZblqsc9xcSnYhEOegWVdaRCPV0LcHbfsmc1mMUcH8" />
-  <!-- ─── Your existing SEO meta tags ─── -->
-  <meta name="description" content="Get the latest football news and transfer updates, refreshed live via GNews.io." />
-  <meta name="keywords" content="football news, transfer news, soccer transfers, live football headlines" />
-  <meta name="author" content="toc89" />
-
-  <!-- ─── Open Graph tags (for social sharing) ─── -->
-  <meta property="og:title" content="Football News & Transfer Updates" />
-  <meta property="og:description" content="Live football headlines and transfer news from around the world." />
-  <meta property="og:url" content="https://toc89.github.io/football-news-site/" />
-  <meta property="og:type" content="website" />
-  <!-- <meta property="og:image" content="https://toc89.github.io/football-news-site/og-image.png" /> -->
-
-  <style>
-    /* ─── Basic page layout ─── */
-    body {
-      font-family: Arial, sans-serif;
-
-      margin: 0;
-      padding: 0;
-      background-color: #f8f9fa;
-    }
-    header {
-      background-color: #003366;
-      color: #ffffff;
-      padding: 1rem;
-      text-align: center;
-    }
-    main {
-      max-width: 800px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-    }
-    section {
-      margin-bottom: 2rem;
-    }
-    section h2 {
-      color: #003366;
-      border-bottom: 2px solid #003366;
-      padding-bottom: 0.25rem;
-      margin-bottom: 1rem;
-    }
-
-    /* ─── Article list styling ─── */
-    ul.article-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    ul.article-list li {
-      margin-bottom: 1.5rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid #ddd;
-    }
-    ul.article-list li a {
-      text-decoration: none;
-      color: #003366;
-      font-weight: bold;
-      font-size: 1.1rem;
-    }
-    ul.article-list li a:hover {
-      text-decoration: underline;
-    }
-    ul.article-list li .meta {
-      font-size: 0.9rem;
-      color: #555;
-      margin-top: 0.25rem;
-    }
-    ul.article-list li p.description {
-      margin-top: 0.5rem;
-      color: #333;
-    }
-
-    /* ─── “Loading…” or “No articles found” text styling ─── */
-    .placeholder {
-      font-size: 1rem;
-      color: #666;
-    }
-  </style>
+  <meta name="description" content="Live football headlines and transfer news." />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
-  <header>
-    <h1>Football News &amp; Transfer Updates</h1>
+<body class="bg-gray-100 text-gray-800">
+
+  <!-- Hero Banner -->
+  <header class="bg-blue-900 text-white py-12 shadow-lg">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+      <h1 class="text-5xl font-extrabold mb-2">⚽ Football News & Transfers</h1>
+      <p class="text-lg">Live headlines refreshed hourly</p>
+      <a href="https://buymeacoffee.com/yourname"
+         class="mt-4 inline-block bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold py-2 px-4 rounded">
+        ☕ Support Me
+      </a>
+    </div>
   </header>
 
-  <main>
-    <!-- ─── Latest General Football News Section ─── -->
+  <!-- Main content -->
+  <main class="max-w-5xl mx-auto py-8 px-4 space-y-16">
+
+    <!-- Latest Football News -->
     <section id="latest-news">
-      <h2>Latest Football News</h2>
-      <div id="latest-news-container">
-        <p class="placeholder">Loading latest news…</p>
+      <h2 class="text-3xl font-semibold text-blue-900 border-b-4 border-blue-900 pb-2 mb-6">
+        📰 Latest Football News
+      </h2>
+      <div id="latest-news-container" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <p class="col-span-full text-gray-600">Loading latest news…</p>
       </div>
     </section>
 
-    <!-- ─── Football Transfer News Section ─── -->
+    <!-- Football Transfer News -->
     <section id="transfer-news">
-      <h2>Football Transfer News</h2>
-      <div id="transfer-news-container">
-        <p class="placeholder">Loading transfer news…</p>
+      <h2 class="text-3xl font-semibold text-blue-900 border-b-4 border-blue-900 pb-2 mb-6">
+        🔄 Transfer News
+      </h2>
+      <div id="transfer-news-container" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <p class="col-span-full text-gray-600">Loading transfer news…</p>
       </div>
     </section>
+
   </main>
 
-  <!-- ─── Live‐News Fetch Script (using GNews.io) ─── -->
+  <!-- Fetch & render script -->
   <script>
-    // ─── Your GNews.io API key ───
     const GNEWS_TOKEN = 'e3a7b27822593cbc6323fef408a74f13';
 
-    /**
-     * Renders an array of GNews articles into the given container.
-     * @param {Array} articles – each item: { title, description, url, image, publishedAt, source: { name, url } }
-     * @param {string} containerId – ID of the <div> where we’ll insert the <ul> list
-     */
-    function renderArticles(articles, containerId) {
-      const container = document.getElementById(containerId);
-      container.innerHTML = ''; // Clear “Loading…” or previous content
-
-      if (!articles || articles.length === 0) {
-        container.innerHTML = '<p class="placeholder">No articles found.</p>';
-        return;
-      }
-
-      const list = document.createElement('ul');
-      list.className = 'article-list';
-
-      articles.forEach((article) => {
-        const li = document.createElement('li');
-
-        // 1) Title as clickable link
-        const a = document.createElement('a');
-        a.href = article.url;
-        a.target = '_blank';
-        a.rel = 'noopener';
-        a.textContent = article.title;
-        li.appendChild(a);
-
-        // 2) Meta info: source name + published date
-        const meta = document.createElement('div');
-        meta.className = 'meta';
-        const publishedDate = new Date(article.publishedAt).toLocaleString();
-        meta.textContent = `${article.source.name} • ${publishedDate}`;
-        li.appendChild(meta);
-
-        // 3) Short description (if available)
-        if (article.description) {
-          const desc = document.createElement('p');
-          desc.className = 'description';
-          desc.textContent = article.description;
-          li.appendChild(desc);
-        }
-
-        list.appendChild(li);
-      });
-
-      container.appendChild(list);
-    }
-
-    /**
-     * Fetches “general football news” from GNews.io.
-     * Returns a Promise that resolves to an array of article objects.
-     */
-    function fetchGeneralNews() {
+    async function fetchNews(query) {
       const url = new URL('https://gnews.io/api/v4/search');
-      url.searchParams.set('q', 'football');        // Search term = “football”
-      url.searchParams.set('lang', 'en');           // Only English-language
-      url.searchParams.set('max', '10');            // Up to 10 articles
-      url.searchParams.set('sortby', 'publishedAt'); // Newest first
-      url.searchParams.set('token', GNEWS_TOKEN);   // Your GNews API key
-
-      return fetch(url.toString())
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error(`GNews returned status ${res.status}`);
-          }
-          return res.json();
-        })
-        .then((json) => {
-          // GNews returns { totalArticles: N, articles: [ … ] }
-          if (!json.articles) {
-            console.error('GNews error payload:', json);
-            return [];
-          }
-          return json.articles;
-        })
-        .catch((err) => {
-          console.error('Error fetching general news:', err);
-          return [];
-        });
-    }
-
-    /**
-     * Fetches “transfer” news from GNews.io by using the broader “football transfer” query.
-     * Returns a Promise resolving to an array of article objects.
-     */
-    function fetchTransferNews() {
-      const url = new URL('https://gnews.io/api/v4/search');
-      // BROADENED QUERY: “football transfer”
-      url.searchParams.set('q', 'football transfer');
+      url.searchParams.set('q', query);
       url.searchParams.set('lang', 'en');
-      url.searchParams.set('max', '10');
+      url.searchParams.set('max', '9');
       url.searchParams.set('sortby', 'publishedAt');
       url.searchParams.set('token', GNEWS_TOKEN);
 
-      return fetch(url.toString())
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error(`GNews returned status ${res.status}`);
-          }
-          return res.json();
-        })
-        .then((json) => {
-          if (!json.articles) {
-            console.error('GNews error payload:', json);
-            return [];
-          }
-          return json.articles;
-        })
-        .catch((err) => {
-          console.error('Error fetching transfer news:', err);
-          return [];
-        });
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`Status ${res.status}`);
+        const json = await res.json();
+        return json.articles || [];
+      } catch (e) {
+        console.error(e);
+        return [];
+      }
     }
 
-    // When the DOM is fully loaded, fetch & render both sets of news
-    document.addEventListener('DOMContentLoaded', () => {
-      // 1) General football news
-      fetchGeneralNews().then((articles) => {
-        renderArticles(articles, 'latest-news-container');
-      });
+    function renderArticles(articles, containerId) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+      if (articles.length === 0) {
+        container.innerHTML = '<p class="col-span-full text-gray-600">No articles found.</p>';
+        return;
+      }
+      articles.forEach(a => {
+        const card = document.createElement('article');
+        card.className = 'bg-white rounded-lg shadow hover:shadow-xl transition p-4 flex flex-col';
 
-      // 2) Transfer-specific news
-      fetchTransferNews().then((articles) => {
-        renderArticles(articles, 'transfer-news-container');
+        const img = document.createElement('img');
+        img.src = a.image || 'https://via.placeholder.com/400x200?text=No+Image';
+        img.alt = a.title;
+        img.className = 'h-40 w-full object-cover rounded-t-md mb-4';
+        card.appendChild(img);
+
+        const title = document.createElement('h3');
+        title.className = 'text-lg font-bold mb-2';
+        title.innerHTML = `<a href="${a.url}" target="_blank" class="hover:text-blue-600">${a.title}</a>`;
+        card.appendChild(title);
+
+        const meta = document.createElement('p');
+        meta.className = 'text-sm text-gray-500 mb-2';
+        const date = new Date(a.publishedAt).toLocaleString();
+        meta.textContent = `${a.source.name} • ${date}`;
+        card.appendChild(meta);
+
+        if (a.description) {
+          const desc = document.createElement('p');
+          desc.className = 'text-gray-700 flex-grow';
+          desc.textContent = a.description;
+          card.appendChild(desc);
+        }
+
+        // Affiliate placeholder
+        const aff = document.createElement('a');
+        aff.href = '#'; // replace with your affiliate link
+        aff.textContent = 'Shop gear →';
+        aff.className = 'mt-4 text-sm text-blue-600 hover:underline';
+        card.appendChild(aff);
+
+        container.appendChild(card);
       });
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const [gen, trans] = await Promise.all([
+        fetchNews('football'),
+        fetchNews('football transfer')
+      ]);
+      renderArticles(gen, 'latest-news-container');
+      renderArticles(trans, 'transfer-news-container');
     });
   </script>
-  <!-- ─── End of GNews script ─── -->
+
 </body>
 </html>
 
