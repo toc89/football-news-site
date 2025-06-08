@@ -1,123 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Football News & Transfers</title>
-  <meta name="description" content="Live football headlines and transfer news." />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 text-gray-800">
-
-  <!-- Hero Banner -->
+  <!-- Hero -->
   <header class="bg-blue-900 text-white py-12 shadow-lg">
-    <div class="max-w-4xl mx-auto px-4 text-center">
+    <div class="max-w-4xl mx-auto text-center px-4">
       <h1 class="text-5xl font-extrabold mb-2">⚽ Football News & Transfers</h1>
       <p class="text-lg">Live headlines refreshed hourly</p>
-      <a href="https://www.buymeacoffee.com/yourname"
-         class="mt-4 inline-block bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold py-2 px-4 rounded">
-        ☕ Support Me
-      </a>
+      <a href="FULL_AFFILIATE_SUPPORT_LINK" target="_blank" class="mt-6 inline-block bg-yellow-500 text-blue-900 px-6 py-2 rounded-lg shadow hover:bg-yellow-600 transition">
+        🔗 Support Me
+n      </a>
     </div>
   </header>
 
-  <!-- Main content -->
-  <main class="max-w-5xl mx-auto py-8 px-4 space-y-16">
-
+  <main class="max-w-6xl mx-auto mt-10 px-4 space-y-16">
     <!-- Latest Football News -->
-    <section id="latest-news">
-      <h2 class="text-3xl font-semibold text-blue-900 border-b-4 border-blue-900 pb-2 mb-8 flex items-center">
-        <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M17 3H3a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V4a1 1 0 00-1-1zm0 2v2H3V5h14zm0 4v6H3V9h14z" />
-        </svg>
-        Latest Football News
-      </h2>
-      <div id="latest-news-container" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <p class="col-span-full text-gray-600">Loading latest news…</p>
-      </div>
+    <section>
+      <h2 class="text-2xl font-semibold mb-4">📑 Latest Football News</h2>
+      <div id="latest-news" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </section>
 
     <!-- Transfer News -->
-    <section id="transfer-news">
-      <h2 class="text-3xl font-semibold text-blue-900 border-b-4 border-blue-900 pb-2 mb-8 flex items-center">
-        <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M4 3h12a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1zm0 2v2h12V5H4zm0 4v6h12V9H4z" />
-        </svg>
-        Transfer News
-      </h2>
-      <div id="transfer-news-container" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <p class="col-span-full text-gray-600">Loading transfer news…</p>
-      </div>
+    <section>
+      <h2 class="text-2xl font-semibold mb-4">🔄 Transfer News</h2>
+      <div id="transfer-news" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </section>
-
   </main>
 
-  <!-- GNews.io script -->
+  <!-- GNews Script -->
   <script>
     const GNEWS_TOKEN = 'e3a7b27822593cbc6323fef408a74f13';
+
+    async function fetchArticles(endpoint) {
+      const res = await fetch(endpoint);
+      const data = await res.json();
+      return data.articles || [];
+    }
 
     function renderArticles(articles, containerId) {
       const container = document.getElementById(containerId);
       container.innerHTML = '';
-      if (!articles || articles.length === 0) {
+      if (articles.length === 0) {
         container.innerHTML = '<p class="col-span-full text-gray-600">No articles found.</p>';
         return;
       }
-
       articles.forEach(a => {
         const card = document.createElement('div');
-        card.className = 'bg-white p-4 rounded-lg shadow flex flex-col';
-
-        // Title link
-        const title = document.createElement('a');
-        title.href = a.url;
-        title.target = '_blank';
-        title.rel = 'noopener';
-        title.className = 'font-semibold text-lg mb-2 hover:underline';
-        title.textContent = a.title;
-        card.appendChild(title);
-
-        // Meta
-        const meta = document.createElement('p');
-        meta.className = 'text-sm text-gray-500 mb-2';
-        const date = new Date(a.publishedAt).toLocaleString();
-        meta.textContent = `${a.source.name} • ${date}`;
-        card.appendChild(meta);
-
-        // Description
-        if (a.description) {
-          const desc = document.createElement('p');
-          desc.className = 'text-gray-700 flex-grow';
-          desc.textContent = a.description;
-          card.appendChild(desc);
-        }
-
-        // Affiliate link
-        const aff = document.createElement('a');
-        aff.href = 'https://www.amazon.co.uk/JOPSHEEN-Magic-Water-Elf-Kids/dp/B0DQ54CFPB?pd_rd_w=0v7wo&content-id=amzn1.sym.d63274d0-bf52-45e7-ae69-2bcf85c5865c%3Aamzn1.symc.ca948091-a64d-450e-86d7-c161ca33337b&pf_rd_p=d63274d0-bf52-45e7-ae69-2bcf85c5865c&pf_rd_r=TMFQD33AE0WRGEPW7H9C&pd_rd_wg=8W2U9&pd_rd_r=ab74c83e-f4c8-44fd-942b-aa1fadc917c4&pd_rd_i=B0DQ54CFPB&linkCode=ll1&tag=footballnewsg-21&linkId=28e338199cc76b532beab728ca57ea06&language=en_GB&ref_=as_li_ss_tl';
-        aff.textContent = 'Shop gear →';
-        aff.target = '_blank';
-        aff.rel = 'noopener';
-        aff.className = 'mt-4 text-sm text-blue-600 hover:underline';
-        card.appendChild(aff);
-
+        card.className = 'bg-white p-4 rounded-lg shadow-lg flex flex-col';
+        card.innerHTML = `
+          <a href="${a.url}" target="_blank" class="mb-2">
+            <img src="${a.image || 'https://via.placeholder.com/400x225?text=No+Image'}" alt="" class="w-full h-48 object-cover rounded">
+          </a>
+          <h3 class="text-lg font-semibold mb-1"><a href="${a.url}" target="_blank">${a.title}</a></h3>
+          <div class="text-sm text-gray-500 mb-2">${new Date(a.publishedAt).toLocaleString()}</div>
+          <p class="flex-grow text-gray-700">${a.description}</p>
+          <div class="mt-4">
+            <a href="FULL_AFFILIATE_PRODUCT_LINK" target="_blank" class="text-blue-600 font-medium hover:underline">Shop now &rarr;</a>
+          </div>
+        `;
         container.appendChild(card);
       });
     }
 
-    async function loadNews() {
-      const latestRes = await fetch(`https://gnews.io/api/v4/top-headlines?token=${GNEWS_TOKEN}&topic=sports&lang=en&max=6`);
-      const latestJson = await latestRes.json();
-      renderArticles(latestJson.articles, 'latest-news-container');
+    (async () => {
+      const headlines = await fetchArticles(`https://gnews.io/api/v4/top-headlines?token=${GNEWS_TOKEN}&lang=en&topic=sports`);
+      renderArticles(headlines, 'latest-news');
 
-      const transferRes = await fetch(`https://gnews.io/api/v4/search?q=football%20transfer&token=${GNEWS_TOKEN}&lang=en&max=6`);
-      const transferJson = await transferRes.json();
-      renderArticles(transferJson.articles, 'transfer-news-container');
-    }
-
-    window.addEventListener('DOMContentLoaded', loadNews);
+      const transfers = await fetchArticles(`https://gnews.io/api/v4/search?token=${GNEWS_TOKEN}&lang=en&topic=sports&q=transfer`);
+      renderArticles(transfers, 'transfer-news');
+    })();
   </script>
-
 </body>
 </html>
