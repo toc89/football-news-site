@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Football News & Transfers</title>
-  <meta name="description" content="Live football headlines and transfer news, refreshed hourly." />
+  <meta name="description" content="Live football headlines and transfer news." />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -15,93 +15,90 @@
     <div class="max-w-4xl mx-auto px-4 text-center">
       <h1 class="text-5xl font-extrabold mb-2">⚽ Football News & Transfers</h1>
       <p class="text-lg">Live headlines refreshed hourly</p>
-      <a href="https://amzn.to/43Gejzu"
-         class="mt-6 inline-block bg-yellow-500 hover:bg-yellow-400 text-blue-900 font-semibold py-2 px-6 rounded-lg shadow"
-         target="_blank" rel="noopener">
+      <a href="https://www.buymeacoffee.com/yourname"
+         class="mt-4 inline-block bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold py-2 px-4 rounded">
         ☕ Support Me
       </a>
     </div>
   </header>
 
+  <!-- Main content -->
   <main class="max-w-5xl mx-auto py-8 px-4 space-y-16">
 
     <!-- Latest Football News -->
     <section id="latest-news">
-      <h2 class="flex items-center text-3xl font-semibold text-blue-900 border-b-4 border-blue-900 mb-4">
-        <span class="material-icons mr-2">article</span> Latest Football News
+      <h2 class="text-3xl font-semibold text-blue-900 border-b-4 border-blue-900 pb-2 mb-8 flex items-center">
+        <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M17 3H3a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V4a1 1 0 00-1-1zm0 2v2H3V5h14zm0 4v6H3V9h14z" />
+        </svg>
+        Latest Football News
       </h2>
-      <div id="latest-news-container"
-           class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div id="latest-news-container" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <p class="col-span-full text-gray-600">Loading latest news…</p>
       </div>
     </section>
 
     <!-- Transfer News -->
     <section id="transfer-news">
-      <h2 class="flex items-center text-3xl font-semibold text-blue-900 border-b-4 border-blue-900 mb-4">
-        <span class="material-icons mr-2">autorenew</span> Transfer News
+      <h2 class="text-3xl font-semibold text-blue-900 border-b-4 border-blue-900 pb-2 mb-8 flex items-center">
+        <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M4 3h12a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1zm0 2v2h12V5H4zm0 4v6h12V9H4z" />
+        </svg>
+        Transfer News
       </h2>
-      <div id="transfer-news-container"
-           class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div id="transfer-news-container" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <p class="col-span-full text-gray-600">Loading transfer news…</p>
       </div>
     </section>
 
   </main>
 
-  <!-- GNews.io + Rendering Script -->
+  <!-- GNews.io script -->
   <script>
     const GNEWS_TOKEN = 'e3a7b27822593cbc6323fef408a74f13';
 
     function renderArticles(articles, containerId) {
       const container = document.getElementById(containerId);
       container.innerHTML = '';
-      if (!articles || !articles.length) {
+      if (!articles || articles.length === 0) {
         container.innerHTML = '<p class="col-span-full text-gray-600">No articles found.</p>';
         return;
       }
+
       articles.forEach(a => {
         const card = document.createElement('div');
         card.className = 'bg-white p-4 rounded-lg shadow flex flex-col';
 
-        // Optional image
-        if (a.image) {
-          const img = document.createElement('img');
-          img.src = a.image;
-          img.alt = a.title;
-          img.className = 'w-full h-40 object-cover rounded-md mb-4';
-          card.appendChild(img);
-        }
-
-        // Title
+        // Title link
         const title = document.createElement('a');
         title.href = a.url;
         title.target = '_blank';
         title.rel = 'noopener';
+        title.className = 'font-semibold text-lg mb-2 hover:underline';
         title.textContent = a.title;
-        title.className = 'font-semibold text-lg text-blue-900 mb-2 hover:underline';
         card.appendChild(title);
 
-        // Meta info
+        // Meta
         const meta = document.createElement('p');
         meta.className = 'text-sm text-gray-500 mb-2';
-        meta.textContent = `${a.source.name} • ${new Date(a.publishedAt).toLocaleString()}`;
+        const date = new Date(a.publishedAt).toLocaleString();
+        meta.textContent = `${a.source.name} • ${date}`;
         card.appendChild(meta);
 
         // Description
         if (a.description) {
           const desc = document.createElement('p');
-          desc.className = 'text-gray-700 flex-grow mb-4';
+          desc.className = 'text-gray-700 flex-grow';
           desc.textContent = a.description;
           card.appendChild(desc);
         }
 
         // Affiliate link
         const aff = document.createElement('a');
-        aff.href = 'https://amzn.to/43Gejzu';
+        aff.href = 'https://www.amazon.co.uk/JOPSHEEN-Magic-Water-Elf-Kids/dp/B0DQ54CFPB?pd_rd_w=0v7wo&content-id=amzn1.sym.d63274d0-bf52-45e7-ae69-2bcf85c5865c%3Aamzn1.symc.ca948091-a64d-450e-86d7-c161ca33337b&pf_rd_p=d63274d0-bf52-45e7-ae69-2bcf85c5865c&pf_rd_r=TMFQD33AE0WRGEPW7H9C&pd_rd_wg=8W2U9&pd_rd_r=ab74c83e-f4c8-44fd-942b-aa1fadc917c4&pd_rd_i=B0DQ54CFPB&linkCode=ll1&tag=footballnewsg-21&linkId=28e338199cc76b532beab728ca57ea06&language=en_GB&ref_=as_li_ss_tl';
+        aff.textContent = 'Shop gear →';
         aff.target = '_blank';
         aff.rel = 'noopener';
-        aff.textContent = 'Shop gear →';
         aff.className = 'mt-4 text-sm text-blue-600 hover:underline';
         card.appendChild(aff);
 
@@ -109,36 +106,18 @@
       });
     }
 
-    function fetchGeneralNews() {
-      const url = new URL('https://gnews.io/api/v4/search');
-      url.searchParams.set('q', 'football');
-      url.searchParams.set('lang', 'en');
-      url.searchParams.set('max', '9');
-      url.searchParams.set('sortby', 'publishedAt');
-      url.searchParams.set('token', GNEWS_TOKEN);
-      return fetch(url)
-        .then(r => r.ok ? r.json() : Promise.reject(r.status))
-        .then(j => j.articles || [])
-        .catch(e => { console.error(e); return []; });
+    async function loadNews() {
+      const latestRes = await fetch(`https://gnews.io/api/v4/top-headlines?token=${GNEWS_TOKEN}&topic=sports&lang=en&max=6`);
+      const latestJson = await latestRes.json();
+      renderArticles(latestJson.articles, 'latest-news-container');
+
+      const transferRes = await fetch(`https://gnews.io/api/v4/search?q=football%20transfer&token=${GNEWS_TOKEN}&lang=en&max=6`);
+      const transferJson = await transferRes.json();
+      renderArticles(transferJson.articles, 'transfer-news-container');
     }
 
-    function fetchTransferNews() {
-      const url = new URL('https://gnews.io/api/v4/search');
-      url.searchParams.set('q', 'football transfer');
-      url.searchParams.set('lang', 'en');
-      url.searchParams.set('max', '9');
-      url.searchParams.set('sortby', 'publishedAt');
-      url.searchParams.set('token', GNEWS_TOKEN);
-      return fetch(url)
-        .then(r => r.ok ? r.json() : Promise.reject(r.status))
-        .then(j => j.articles || [])
-        .catch(e => { console.error(e); return []; });
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      fetchGeneralNews().then(arts => renderArticles(arts, 'latest-news-container'));
-      fetchTransferNews().then(arts => renderArticles(arts, 'transfer-news-container'));
-    });
+    window.addEventListener('DOMContentLoaded', loadNews);
   </script>
+
 </body>
 </html>
